@@ -1,6 +1,6 @@
 # Google Spreadhsheet Api - Values Batch Update
 
-A [Supercode](http://gosupercode.com) function that updata values multiple request in one call google spreadsheet.
+A [Supercode](http://gosupercode.com) function that update values multiple request in one call google spreadsheet.
 Still developing for other methods of google spreadsheet api.
 
 ## Server Usage
