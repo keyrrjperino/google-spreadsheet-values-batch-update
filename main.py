@@ -9,14 +9,10 @@ SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 
 
 class GoogleSpreadsheet:
-    def __init__(self, credentials_json_data, spreadsheet_id, range_name, data=None, major_dimension="ROWS",
-                 value_input_option="RAW"):
+    def __init__(self, credentials_json_data, spreadsheet_id, payload=None):
         self.credentials_json_data = credentials_json_data
         self.spreadsheet_id = spreadsheet_id
-        self.range_name = range_name
-        self.data = data
-        self.major_dimension = major_dimension
-        self.value_input_option = value_input_option
+        self.payload = payload
 
     def get_sheets_service(self):
         credentials = ServiceAccountCredentials.from_json_keyfile_dict(self.credentials_json_data, scopes=SCOPES)
@@ -29,21 +25,12 @@ class GoogleSpreadsheet:
             discoveryServiceUrl=SHEETS_DISCOVERY_URL
         )
 
-    def update(self):
-        final_payload = {
-            "range": self.range_name,
-            "majorDimension": self.major_dimension,
-            "values": self.data
-        }
-
+    def values_batch_update(self):
         service = self.get_sheets_service()
 
         try:
-            result = service.spreadsheets().values().update(
-                spreadsheetId=self.spreadsheet_id, range=self.range_name,
-                valueInputOption=self.value_input_option,
-                body=final_payload
-            ).execute()
+            result = service.spreadsheets().values().batchUpdate(
+                spreadsheetId=self.spreadsheet_id, body=self.payload).execute()
 
             response = {
                 "data": result
@@ -68,15 +55,13 @@ class GoogleSpreadsheet:
         return response
 
 
-def main(credentials_json_data=None, spreadsheet_id="", range_name="", data=None,
-         major_dimension="ROWS", value_input_option="RAW"):
+def main(credentials_json_data=None, spreadsheet_id="", payload=None):
     google_spreadsheet = GoogleSpreadsheet(
         credentials_json_data=credentials_json_data,
         spreadsheet_id=spreadsheet_id,
-        range_name=range_name,
-        data=data,
-        major_dimension=major_dimension,
-        value_input_option=value_input_option
+        payload=payload,
     )
 
-    return google_spreadsheet.update()
+    response = google_spreadsheet.values_batch_update()
+
+    return response
